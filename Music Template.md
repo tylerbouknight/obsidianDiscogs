@@ -1,6 +1,6 @@
 ---
 title: {{VALUE:title}}
-year: {{year}}
+year: {{VALUE:year}}
 genre: {{VALUE:genre}}
 style: {{VALUE:style}}
 label: {{VALUE:label}}
