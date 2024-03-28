@@ -52,7 +52,11 @@ async function start(params, settings) {
   QuickAdd.variables = {
     ...choice,
     title: choice.title,
-    fileName: replaceIllegalFileNameCharactersInString(choice.title),
+    fileName: replaceIllegalFileNameCharactersInString(choice.albumName),
+    artistName: linkifyList(choice.artistName.split(",")),
+    genre: linkifyList(choice.genre),
+    style: linkifyList(choice.style),
+    
   };
 console.log(choice);
 }
@@ -63,14 +67,15 @@ function formatTitleForSuggestion(result) {
 
 function linkifyList(list) {
   if (list.length === 0) return "";
-  if (list.length === 1) return `[[${list[0]}]]`;
+  if (list.length === 1) return `"[[${list[0]}]]"`;
 
-  return list.map((item) => `[[${item.trim()}]]`).join(", ");
+  return list.map(item => `\n  - "[[${item.trim()}]]"`).join("");
 }
 
 function replaceIllegalFileNameCharactersInString(string) {
   return string.replace(/[\\,#%&\{\}\/*<>?$\'\":@]*/g, "");
 }
+
 
 async function getByQuery(query) {
   const url = `https://api.discogs.com/database/search?q=${query}&key=${Settings[API_KEY_OPTION]}&secret=${Settings[API_SECRET_OPTION]}`;
@@ -91,7 +96,11 @@ async function getByQuery(query) {
 
   // Return the desired data
   // Add any other properties you need from the results
-  return results.map((result) => ({
+  return results.map((result) => {
+     const [artistName, albumName] = result.title.split(' - ');
+    return {
+    artistName,
+    albumName,
     title: result.title,
     year: result.year,
     country: result.country,
@@ -100,6 +109,9 @@ async function getByQuery(query) {
     genre: result.genre,
     style: result.style,
     label: result.label,
+    artist_id: result.artist_id,
+ 
     // ...
-  }));
+    };
+  });
 }
