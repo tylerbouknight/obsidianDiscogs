@@ -49,16 +49,17 @@ async function start(params, settings) {
     notice("No choice selected.");
     throw new Error("No choice selected.");
   }
+
   QuickAdd.variables = {
     ...choice,
     title: choice.title,
-    fileName: replaceIllegalFileNameCharactersInString(choice.albumName),
+    fileName: replaceIllegalCharacters(choice.albumName),
     artistName: linkifyList(choice.artistName.split(",")),
     genre: linkifyList(choice.genre),
     style: linkifyList(choice.style),
-    
   };
-console.log(choice);
+
+  console.log(QuickAdd.variables);
 }
 
 function formatTitleForSuggestion(result) {
@@ -66,13 +67,17 @@ function formatTitleForSuggestion(result) {
 }
 
 function linkifyList(list) {
-  if (list.length === 0) return "";
-  if (list.length === 1) return `"[[${list[0]}]]"`;
+  // Trim whitespace and ensure the array is filtered for non-empty entries
+  list = list.map(item => item.trim()).filter(item => item !== "");
 
-  return list.map(item => `\n  - "[[${item.trim()}]]"`).join("");
+  if (list.length === 0) return "";
+  if (list.length === 1) return `[[${list[0]}]]`;  // Properly format single entries
+
+  // Format multiple entries as a bulleted list with links
+  return list.map(item => `- [[${item}]]`).join("\n");
 }
 
-function replaceIllegalFileNameCharactersInString(string) {
+function replaceIllegalCharacters(string) {
   return string.replace(/[\\,#%&\{\}\/*<>?$\'\":@]*/g, "");
 }
 
@@ -90,11 +95,9 @@ async function getByQuery(query) {
     throw new Error(errorMessage);
   }
 
-  const data = await response.json(); // Parse the response JSON
-  const results = data.results; // Extract the results from the parsed data
+  const data = await response.json();
+  const results = data.results;
 
-
-  // Return the desired data
   // Add any other properties you need from the results
   return results.map((result) => {
      const [artistName, albumName] = result.title.split(' - ');
@@ -111,7 +114,6 @@ async function getByQuery(query) {
     label: result.label,
     artist_id: result.artist_id,
  
-    // ...
     };
   });
 }
