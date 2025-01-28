@@ -1,6 +1,6 @@
 ---
 title: {{VALUE:albumName}}
-artist: {{VALUE:artisName}}
+artist: {{VALUE:artistName}}
 year: {{VALUE:year}}
 genre: {{VALUE:genre}}
 style: {{VALUE:style}}
